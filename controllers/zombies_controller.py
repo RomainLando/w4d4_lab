@@ -56,6 +56,7 @@ def delete_zombie(id):
     zombie_repository.delete(id)
     return redirect("/zombies")
 
+# SHOW
 @zombies_blueprint.route("/zombies/<id>")
 def show_zombie(id):
     zombie = zombie_repository.select(id)
