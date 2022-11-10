@@ -3,6 +3,7 @@ from models.human import Human
 from models.zombie import Zombie
 from models.zombie_type import ZombieType
 import repositories.zombie_type_repository as zombie_type_repository
+import repositories.human_repository as human_repository
 
 def save(zombie):
     sql = "INSERT INTO zombies (name, zombie_type_id) VALUES (%s, %s) RETURNING id"
@@ -52,3 +53,21 @@ def update(zombie):
     sql = "UPDATE zombies SET (name, zombie_type_id) = (%s, %s) WHERE id = %s"
     values = [zombie.name, zombie.zombie_type.id, zombie.id]
     run_sql(sql, values)
+
+def show_victims(zombie):
+    victims = []
+    sql = """SELECT humans.id AS human_id
+    FROM humans
+    INNER JOIN bitings
+    ON humans.id = bitings.human_id
+    INNER JOIN zombies
+    ON zombies.id = bitings.zombie_id WHERE zombies.id = %s"""
+    values = [zombie.id]
+    results = run_sql(sql, values)
+    for result in results:
+        victim = human_repository.select(result["human_id"])
+        victims.append(victim)
+    return victims
+
+
+
